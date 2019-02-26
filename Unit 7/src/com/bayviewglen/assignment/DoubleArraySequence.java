@@ -112,6 +112,9 @@ public class DoubleArraySequence implements Cloneable{
 	 *   arithmetic overflow.
 	 **/
 	public void addAfter(double d){
+		this.ensureCapacity(manyItems * 2); 
+		
+		
 		
 	}
 /**
@@ -259,8 +262,7 @@ public class DoubleArraySequence implements Cloneable{
 		for(int i = 0; i < data.length; i++) {
 			nData[i] = data[i]; 
 		}
-		data = nData; 
-		
+		data = nData;	
 	}
 /**
 	 * Accessor method to get the current capacity of this sequence. 
