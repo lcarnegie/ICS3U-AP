@@ -134,8 +134,7 @@ public class DoubleArraySequence implements Cloneable{
 	 *   arithmetic overflow.
 	 **/
 	public void addBefore(double element){
-		
-		
+			
 	}
 /**
 	 * Place the contents of another sequence at the end of this sequence.
@@ -157,7 +156,15 @@ public class DoubleArraySequence implements Cloneable{
 	 *   that will cause the sequence to fail.
 	 **/
 	public void addAll(DoubleArraySequence addend){
-		
+		if(addend == null)
+			throw new NullPointerException("Passed Object addend is null"); 
+		this.trimToSize();
+		int oldLengthOfThis = this.data.length; 
+		this.ensureCapacity(this.data.length + addend.data.length);
+		for(int j = oldLengthOfThis; j < addend.data.length; j++) {
+			this.data[j] = addend.data[j]; 
+		}
+		this.manyItems += addend.manyItems; 		
 }   
 /**
 	 * Move forward, so that the current element is now the next element in
@@ -174,10 +181,10 @@ public class DoubleArraySequence implements Cloneable{
 	 *   Indicates that there is no current element, so 
 	 *   advance may not be called.
 	 **/
-	public void advance( ){
+	public void advance(){
 		if(isCurrent() == true)
 			currentIndex++; 
-		throw new IllegalStateException("There is no current element: removeCurrent() may not be called");
+		throw new IllegalStateException("There is no current element: advance() may not be called");
 	}
 /**
 	 * Generate a copy of this sequence.
@@ -226,20 +233,12 @@ public class DoubleArraySequence implements Cloneable{
 	 *   that will cause the sequence to fail.
 	 **/   
 	public static DoubleArraySequence catenation(DoubleArraySequence s1, DoubleArraySequence s2){
-		if(s1 == null || s2 == null)
-			throw new NullPointerException("One or both of the input sequences is null"); 
-		s1.trimToSize();
-		s2.trimToSize(); 
-		DoubleArraySequence r = new DoubleArraySequence(s1.size() + s2.size()); 
-		int i; 
-		for(i = 0; i < s1.data.length; i++) {
-			r.data[i] = s1.data[i]; 
+		if(s1 != null || s2 != null) {
+			s1.addAll(s2); 
+			s1.currentIndex = s1.manyItems; 
+			return s1; 
 		}
-		for(int j = 0; j < s2.data.length; j++) {
-			r.data[i] = s2.data[j];
-			i++; 
-		}
-		return r; 
+		throw new NullPointerException("One or both of the input sequences is null"); 
 		
 }
 /**
@@ -254,7 +253,7 @@ public class DoubleArraySequence implements Cloneable{
 	 *   Indicates insufficient memory for: new int[minimumCapacity].
 	 **/
 	public void ensureCapacity(int minimumCapacity){
-		if(minimumCapacity <= data.length)
+		if(minimumCapacity <= this.data.length)
 			return; 
 		double[] nData = new double[minimumCapacity]; 
 		for(int i = 0; i < data.length; i++) {
@@ -272,7 +271,7 @@ public class DoubleArraySequence implements Cloneable{
 	 *   the current capacity of this sequence
 	 **/
 	public int getCapacity(){
-		return this.data.length; 
+		return data.length; 
 	}
 /**
 	 * Accessor method to get the current element of this sequence. 
@@ -290,7 +289,7 @@ public class DoubleArraySequence implements Cloneable{
 			return data[currentIndex];
 		}
 		else {
-			throw new IllegalStateException("There is no current element: removeCurrent() may not be called");
+			throw new IllegalStateException("There is no current element: getCurrent() may not be called");
 		}
 	}
 /**
@@ -380,6 +379,12 @@ public class DoubleArraySequence implements Cloneable{
 	
 	// The new double array sequence is a copy of the DoubleArraySequence src.
 	public DoubleArraySequence(DoubleArraySequence src){
+		this.manyItems = src.manyItems; 
+		this.currentIndex = src.currentIndex; 
+		this.data = new double[src.data.length]; 
+		for(int i = 0; i < this.manyItems; i++) {
+			this.data[i] = src.data[i]; 
+		}
 		
 	}
 }
