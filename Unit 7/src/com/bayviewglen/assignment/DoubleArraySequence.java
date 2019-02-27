@@ -112,7 +112,7 @@ public class DoubleArraySequence implements Cloneable{
 	 *   arithmetic overflow.
 	 **/
 	public void addAfter(double d){
-		this.ensureCapacity(manyItems * 2); 
+		
 		
 		
 		
@@ -162,10 +162,9 @@ public class DoubleArraySequence implements Cloneable{
 		if(addend == null)
 			throw new NullPointerException("Passed Object addend is null"); 
 		this.trimToSize();
-		int oldLengthOfThis = this.data.length; 
 		this.ensureCapacity(this.data.length + addend.data.length);
-		for(int j = oldLengthOfThis; j < addend.data.length; j++) {
-			this.data[j] = addend.data[j]; 
+		for(int j = manyItems, i = 0; i < addend.data.length; j++, i++) {
+			this.data[j] = addend.data[i]; 
 		}
 		this.manyItems += addend.manyItems; 		
 }   
@@ -185,7 +184,7 @@ public class DoubleArraySequence implements Cloneable{
 	 *   advance may not be called.
 	 **/
 	public void advance(){
-		if(isCurrent() == true)
+		if(isCurrent())
 			currentIndex++; 
 		throw new IllegalStateException("There is no current element: advance() may not be called");
 	}
@@ -237,9 +236,10 @@ public class DoubleArraySequence implements Cloneable{
 	 **/   
 	public static DoubleArraySequence catenation(DoubleArraySequence s1, DoubleArraySequence s2){
 		if(s1 != null || s2 != null) {
-			s1.addAll(s2); 
-			s1.currentIndex = s1.manyItems; 
-			return s1; 
+			DoubleArraySequence temp = new DoubleArraySequence(s1); 
+			temp.addAll(s2);  
+			temp.currentIndex = s1.manyItems; 
+			return temp; 
 		}
 		throw new NullPointerException("One or both of the input sequences is null"); 
 		
@@ -301,10 +301,8 @@ public class DoubleArraySequence implements Cloneable{
 	 * @return
 	 *   true (there is a current element) or false (there is no current element at the moment)
 	 **/
-	public boolean isCurrent(){ //see if sequence has a specified current element
-		if(currentIndex == manyItems)
-			return false; 
-		return true; 
+	public boolean isCurrent(){//see if sequence has a specified current element
+		return !(currentIndex == manyItems);  
 	}
 /**
 	 * Remove the current element from this sequence.
