@@ -112,10 +112,24 @@ public class DoubleArraySequence implements Cloneable{
 	 *   arithmetic overflow.
 	 **/
 	public void addAfter(double d){
-		
-		
-		
-		
+		if(this.data.length == manyItems) {
+			ensureCapacity(DEFAULT_CAPACITY);
+		}
+		if(!isCurrent())
+			currentIndex = manyItems - 1;
+		double[] nData = new double[this.data.length]; 
+		int i; 
+		for(i = 0; i <= currentIndex; i++){
+			nData[i] = this.data[i]; 
+		}
+		nData[i] = d; 
+		currentIndex = i; 
+		manyItems++; 
+		i++; 
+		for(int j = i; j < manyItems; j++) {
+			nData[j] = data[j-1]; 
+		}
+		this.data = nData; 	
 	}
 /**
 	 * Add a new element to this sequence, before the current element. 
@@ -137,6 +151,24 @@ public class DoubleArraySequence implements Cloneable{
 	 *   arithmetic overflow.
 	 **/
 	public void addBefore(double element){
+		if(this.data.length == manyItems) {
+		ensureCapacity(DEFAULT_CAPACITY);
+		}
+		if(!isCurrent())
+			currentIndex = 0; 
+		double[] nData = new double[this.data.length]; 
+		int i; 
+		for(i = 0; i < currentIndex; i++){
+			nData[i] = this.data[i]; 
+		}
+		nData[i] = element; 
+		currentIndex = i; 
+		manyItems++; 
+		i++; 
+		for(int j = i; j < manyItems; j++) {
+			nData[j] = data[j-1]; 
+		}
+		this.data = nData;
 			
 	}
 /**
@@ -256,13 +288,13 @@ public class DoubleArraySequence implements Cloneable{
 	 *   Indicates insufficient memory for: new int[minimumCapacity].
 	 **/
 	public void ensureCapacity(int minimumCapacity){
-		if(minimumCapacity <= this.data.length)
-			return; 
+		if(this.data.length < minimumCapacity) {
 		double[] nData = new double[minimumCapacity]; 
 		for(int i = 0; i < data.length; i++) {
 			nData[i] = data[i]; 
 		}
-		data = nData;	
+		data = nData;
+		}
 	}
 /**
 	 * Accessor method to get the current capacity of this sequence. 
