@@ -112,30 +112,27 @@ public class DoubleArraySequence implements Cloneable{
 	 *   arithmetic overflow.
 	 **/
 	public void addAfter(double d){
-		if(this.data.length == manyItems) {
-			ensureCapacity(DEFAULT_CAPACITY);
+		if(data.length == manyItems){
+			ensureCapacity(DEFAULT_CAPACITY); 
 		}
-		if(!isCurrent())
-			currentIndex = manyItems - 1;
-		double[] nData = new double[this.data.length]; 
-		int i; 
-		for(i = 0; i <= currentIndex; i++){
-			nData[i] = this.data[i]; 
-		}
-		nData[i] = d; 
-		currentIndex = i; 
+		if(!isCurrent()){
+			manyItems++; 
+			data[manyItems - 1] = d; 
+		} else {
 		manyItems++; 
-		i++; 
-		for(int j = i; j < manyItems; j++) {
-			nData[j] = data[j-1]; 
+		int i; 
+		for(i = manyItems - 1; i > currentIndex + 1; i--) {
+			data[i] = data[i-1]; 
 		}
-		this.data = nData; 	
+		data[i] = d; 
+		currentIndex = i; 
+		}
 	}
 /**
 	 * Add a new element to this sequence, before the current element. 
 	 * If the new element would take this sequence beyond its current capacity,
 	 * then the capacity is increased before adding the new element.
-	 * @param element
+	 * @param d
 	 *   the new element that is being added
 	 * @postcondition
 	 *   A new copy of the element has been added to this sequence. If there was
@@ -150,26 +147,20 @@ public class DoubleArraySequence implements Cloneable{
 	 *   Integer.MAX_VALUE will cause the sequence to fail with an
 	 *   arithmetic overflow.
 	 **/
-	public void addBefore(double element){
-		if(this.data.length == manyItems) {
-		ensureCapacity(DEFAULT_CAPACITY);
+	public void addBefore(double d){
+		if(data.length == manyItems) {
+			ensureCapacity(manyItems * 2); 
 		}
-		if(!isCurrent())
+		if(!isCurrent()) {
 			currentIndex = 0; 
-		double[] nData = new double[this.data.length]; 
-		int i; 
-		for(i = 0; i < currentIndex; i++){
-			nData[i] = this.data[i]; 
 		}
-		nData[i] = element; 
-		currentIndex = i; 
 		manyItems++; 
-		i++; 
-		for(int j = i; j < manyItems; j++) {
-			nData[j] = data[j-1]; 
+		int i; 
+		for(i = manyItems - 1; i > currentIndex; i--){
+			data[i] = data[i-1]; 
 		}
-		this.data = nData;
-			
+		currentIndex = i; 
+		data[i] = d; 
 	}
 /**
 	 * Place the contents of another sequence at the end of this sequence.
@@ -193,9 +184,11 @@ public class DoubleArraySequence implements Cloneable{
 	public void addAll(DoubleArraySequence addend){
 		if(addend == null)
 			throw new NullPointerException("Passed Object addend is null"); 
+		if(manyItems > 0) {
 		this.trimToSize();
-		this.ensureCapacity(this.data.length + addend.data.length);
-		for(int j = manyItems, i = 0; i < addend.data.length; j++, i++) {
+		this.ensureCapacity(this.manyItems + addend.manyItems);
+		}
+		for(int j = manyItems, i = 0; i < addend.manyItems; j++, i++) {
 			this.data[j] = addend.data[i]; 
 		}
 		this.manyItems += addend.manyItems; 		
@@ -216,9 +209,10 @@ public class DoubleArraySequence implements Cloneable{
 	 *   advance may not be called.
 	 **/
 	public void advance(){
-		if(isCurrent())
-			currentIndex++; 
-		throw new IllegalStateException("There is no current element: advance() may not be called");
+		if(!isCurrent())
+			throw new IllegalStateException("There is no current element: advance() may not be called");
+		currentIndex++; 
+		
 	}
 /**
 	 * Generate a copy of this sequence.
@@ -270,7 +264,7 @@ public class DoubleArraySequence implements Cloneable{
 		if(s1 != null || s2 != null) {
 			DoubleArraySequence temp = new DoubleArraySequence(s1); 
 			temp.addAll(s2);  
-			temp.currentIndex = s1.manyItems; 
+			temp.currentIndex = temp.manyItems; 
 			return temp; 
 		}
 		throw new NullPointerException("One or both of the input sequences is null"); 
@@ -290,7 +284,7 @@ public class DoubleArraySequence implements Cloneable{
 	public void ensureCapacity(int minimumCapacity){
 		if(this.data.length < minimumCapacity) {
 		double[] nData = new double[minimumCapacity]; 
-		for(int i = 0; i < data.length; i++) {
+		for(int i = 0; i < manyItems; i++) {
 			nData[i] = data[i]; 
 		}
 		data = nData;
@@ -380,7 +374,7 @@ public class DoubleArraySequence implements Cloneable{
 		if(manyItems == 0) {
 			currentIndex = manyItems; 
 		}
-		this.currentIndex = 0; 
+		currentIndex = 0; 
 	}
 /**
 	 * Reduce the current capacity of this sequence to its actual size (i.e., the
